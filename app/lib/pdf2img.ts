@@ -15,8 +15,12 @@ async function loadPdfJs(): Promise<any> {
   isLoading = true;
   // @ts-expect-error - pdfjs-dist/build/pdf.mjs is not a module
   loadPromise = import("pdfjs-dist/build/pdf.mjs").then((lib) => {
-    // Set the worker source to use local file
-    lib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+    // Set the worker source from the package
+    const workerSrc = new URL(
+      "pdfjs-dist/build/pdf.worker.mjs",
+      import.meta.url
+    ).href;
+    lib.GlobalWorkerOptions.workerSrc = workerSrc;
     pdfjsLib = lib;
     isLoading = false;
     return lib;
@@ -30,7 +34,7 @@ export async function convertPdfToImage(
 ): Promise<PdfConversionResult> {
   try {
     const lib = await loadPdfJs();
-
+    console.log("1");
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await lib.getDocument({ data: arrayBuffer }).promise;
     const page = await pdf.getPage(1);
@@ -38,15 +42,15 @@ export async function convertPdfToImage(
     const viewport = page.getViewport({ scale: 4 });
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
-
+    console.log("2");
     canvas.width = viewport.width;
     canvas.height = viewport.height;
-
+    console.log("3");
     if (context) {
       context.imageSmoothingEnabled = true;
       context.imageSmoothingQuality = "high";
     }
-
+    console.log("4");
     await page.render({ canvasContext: context!, viewport }).promise;
 
     return new Promise((resolve) => {
@@ -58,24 +62,31 @@ export async function convertPdfToImage(
             const imageFile = new File([blob], `${originalName}.png`, {
               type: "image/png",
             });
+            console.log("5");
 
             resolve({
               imageUrl: URL.createObjectURL(blob),
               file: imageFile,
             });
+            console.log("6");
           } else {
             resolve({
               imageUrl: "",
               file: null,
               error: "Failed to create image blob",
             });
+            console.log("7");
           }
         },
         "image/png",
         1.0
-      ); // Set quality to maximum (1.0)
+      );
+      console.log("7");
+      // Set quality to maximum (1.0)
     });
   } catch (err) {
+    console.log("8");
+
     return {
       imageUrl: "",
       file: null,
