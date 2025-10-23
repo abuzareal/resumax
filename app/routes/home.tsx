@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Resumind" },
+    { title: "Resumax" },
     { name: "description", content: "Smart feedback for your dream job!" },
   ];
 }
@@ -22,22 +22,22 @@ export default function Home() {
     if (!auth.isAuthenticated) navigate("/auth?next=/");
   }, [auth.isAuthenticated]);
 
-  // useEffect(() => {
-  //   const loadResumes = async () => {
-  //     setLoadingResumes(true);
+  useEffect(() => {
+    const loadResumes = async () => {
+      setLoadingResumes(true);
 
-  //     const resumes = (await kv.list("resume:*", true)) as KVItem[];
+      const resumes = (await kv.list("resume:*", true)) as KVItem[];
 
-  //     const parsedResumes = resumes?.map(
-  //       (resume) => JSON.parse(resume.value) as Resume
-  //     );
+      const parsedResumes = resumes?.map(
+        (resume) => JSON.parse(resume.value) as Resume
+      );
 
-  //     setResumes(parsedResumes || []);
-  //     setLoadingResumes(false);
-  //   };
+      setResumes(parsedResumes || []);
+      setLoadingResumes(false);
+    };
 
-  //   loadResumes();
-  // }, []);
+    loadResumes();
+  }, []);
 
   return (
     <main className="bg-[url('/images/bg-main.svg')] bg-cover">
